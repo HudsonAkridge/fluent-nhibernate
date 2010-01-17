@@ -116,6 +116,17 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
 	            .HasAttribute("type", typeof(int).AssemblyQualifiedName);
 	    }
 
+		[Test]
+		public void KeyPropertyAllowsForEnumTypes()
+		{
+			//Bug 141
+			new MappingTester<CompIdTarget>()
+			   .ForMapping(c => c.CompositeId(x => x.Child).KeyProperty(x => x.IdChildEnum, kp => kp.Type(typeof(int))))
+			   .Element("class/composite-id/key-property")
+			   .HasAttribute("type", typeof(int).AssemblyQualifiedName)
+			   .HasAttribute("name", "IdChildEnum");
+		}
+
 		public class CompIdTarget
 		{
 			public virtual long LongId { get; set; }
@@ -127,6 +138,13 @@ namespace FluentNHibernate.Testing.DomainModel.Mapping
 		public class CompIdChild
 		{
 			public virtual long ChildId { get; set; }
+			public CompIdChildEnum IdChildEnum { get; set; }
+
+			public enum CompIdChildEnum
+			{
+				Test,
+				Ing
+			}
 		}
 	}
 }
